@@ -2,18 +2,18 @@
 struct Mod5_97(u32);
 
 fn modpow(b: u32, e: u32, p: u32) -> u32 {
-    let l = 4;
-    let mut acc = 1;
+    let l = 8;
+    let mut acc = 1u64;
     
     for _ in 0..e/l {
-        acc *= u32::pow(b, l);
-        acc %= p;
+        acc *= u64::pow(b as u64, l);
+        acc %= p as u64;
     }
     
-    acc *= u32::pow(b, e % l);
-    acc %= p;
+    acc *= u64::pow(b as u64, e % l);
+    acc %= p as u64;
     
-    return acc;
+    return acc as _;
 }
 
 impl std::ops::Mul<u32> for Mod5_97 {
@@ -47,14 +47,16 @@ impl From<i32> for Mod5_97 {
 fn main() {
     // Verifier's knowledge
     let x = 999;
-    let shift = 17;
+    let shift = 16;
     let t = x * x - 3 * x + 2; // The target polynomial solved for x
     let s3 = Mod5_97::from(x * x * x);
     let s2 = Mod5_97::from(x * x);
     let s1 = Mod5_97::from(x);
+    let s0 = Mod5_97::from(1);
     let s3_shift = Mod5_97::from(x * x * x) * shift;
     let s2_shift = Mod5_97::from(x * x) * shift;
     let s1_shift = Mod5_97::from(x) * shift;
+    let s0_shift = Mod5_97::from(1) * shift;
 
     // To prover:
     // p(x) = x^3 - 6x^2 + 11x - 6
@@ -72,17 +74,21 @@ fn main() {
     let s2_shift = s2_shift; // | ...These too
     let s1_shift = s1_shift; // /
     
-    // Solve encrypted p and h with s factors
-    let ep = s3 * p_c0 + s2 * p_c1 + s1 * p_c2 + Mod5_97::from(p_c3);
+    // Solve encrypted p, h, and p_shift with s and s_shift factors
+    let ep = s3 * p_c0 + s2 * p_c1 + s1 * p_c2 + s0 * p_c3;
     let eh = s1 * h_c0 + Mod5_97::from(h_c1);
+    let ep_shift = s3_shift * p_c0 + s2_shift * p_c1 + s1_shift * p_c2 + s0_shift * p_c3;
 
-    // Solve encrypted p and h with s_shift factors
-    let ep_shift = s3_shift * p_c0 + s2_shift * p_c1 + s1_shift * p_c2 + Mod5_97::from(p_c3);
-    let eh_shift = s1_shift * h_c0 + Mod5_97::from(h_c1);
+    // Apply shift so encrypted values sent to verifier cant be guess
+    let delta = 39; // Some random delta 
+    let ep = ep * delta;
+    let eh = eh * delta;
+    let ep_shift = ep_shift * delta;
 
     // Back to verified:
     let correct_roots = eh * t == ep;
     let correct_form = ep * shift == ep_shift;
-    assert!(correct_roots && correct_form);
+    assert!(correct_roots);
+    assert!(correct_form);
     println!("Pass");
 }
