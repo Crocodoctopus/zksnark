@@ -1,14 +1,15 @@
+// Homomorphic encryption using powers
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct E32<const BASE: u32, const P: u32>(u32);
+pub struct E1<const P: u32>(u32);
 
-impl<const BASE: u32, const P: u32> std::ops::Add<Self> for E32<BASE, P> {
+impl<const P: u32> std::ops::Add<Self> for E1<P> {
     type Output = Self;
     fn add(self, opr: Self) -> Self::Output {
         Self(self.0 * opr.0 % 97)
     }
 }
 
-impl<const BASE: u32, const P: u32> std::ops::Mul<u32> for E32<BASE, P> {
+impl<const P: u32> std::ops::Mul<u32> for E1<P> {
     type Output = Self;
     fn mul(self, opr: u32) -> Self::Output {
         let b = self.0;
@@ -27,7 +28,7 @@ impl<const BASE: u32, const P: u32> std::ops::Mul<u32> for E32<BASE, P> {
     }
 }
 
-impl<const BASE: u32, const P: u32> std::ops::Mul<i32> for E32<BASE, P> {
+impl<const P: u32> std::ops::Mul<i32> for E1<P> {
     type Output = Self;
     fn mul(self, opr: i32) -> Self::Output {
         let opr = if opr < 0 {
@@ -39,8 +40,8 @@ impl<const BASE: u32, const P: u32> std::ops::Mul<i32> for E32<BASE, P> {
     }
 }
 
-impl<const BASE: u32, const P: u32> From<i32> for E32<BASE, P> {
-    fn from(x: i32) -> Self {
-        Self(BASE) * x
+impl<const P: u32> From<u32> for E1<P> {
+    fn from(base: u32) -> Self {
+        Self(base)
     }
 }
