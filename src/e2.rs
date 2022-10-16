@@ -65,7 +65,7 @@ impl<const ORDER: u32, const P: u32> std::ops::Add<Self> for E2<ORDER, P> {
         };
 
         // double
-        if xg == x && yg == y {
+        if (xg - x).residue() == 0 {
             return self.double();
         }
 

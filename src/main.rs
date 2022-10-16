@@ -3,11 +3,11 @@ mod e2;
 
 fn main() {
     // generator
-    //let g = e2::E2::<93, 97>::from((3u32, 15u32));
-    let g = e1::E1::<97>::from(5);
+    let g = e2::E2::<93, 97>::from((3u32, 15u32));
+    //let g = e1::E1::<97>::from(5);
 
     // Verifier's knowledge
-    let x = 13;
+    let x = 999;
     let shift = 16;
     let t = x * x - 3 * x + 2; // The target polynomial solved for x
     let s3 = g * (x * x * x);
