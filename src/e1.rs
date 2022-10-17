@@ -1,47 +1,47 @@
+use num_modular::MontgomeryInt;
+use num_modular::ModularInteger;
+use num_traits::Pow;
+use num_traits::Inv;
+
 // Homomorphic encryption using powers
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct E1<const P: u32>(u32);
+pub struct E1<const P: u32>(MontgomeryInt<u32>);
+
+impl<const P: u32> E1<P> {
+    pub fn residue(&self) -> u32 {
+        self.0.residue()
+    }
+}
 
 impl<const P: u32> std::ops::Add<Self> for E1<P> {
     type Output = Self;
-    fn add(self, opr: Self) -> Self::Output {
-        Self(self.0 * opr.0 % 97)
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 * rhs.0)
     }
 }
 
 impl<const P: u32> std::ops::Mul<u32> for E1<P> {
     type Output = Self;
-    fn mul(self, opr: u32) -> Self::Output {
-        let b = self.0;
-        let l = 8;
-        let mut acc = 1u64;
-
-        for _ in 0..opr / l {
-            acc *= u64::pow(b as u64, l);
-            acc %= P as u64;
-        }
-
-        acc *= u64::pow(b as u64, opr % l);
-        acc %= P as u64;
-
-        Self(acc as u32)
+    fn mul(self, rhs: u32) -> Self::Output {
+        Self(self.0.pow(rhs))
     }
 }
 
 impl<const P: u32> std::ops::Mul<i32> for E1<P> {
     type Output = Self;
-    fn mul(self, opr: i32) -> Self::Output {
-        let opr = if opr < 0 {
-            (-opr) as u32 * 95
+    fn mul(self, rhs: i32) -> Self::Output {
+        if rhs < 0 {
+            let rhs = rhs.abs() as u32;
+            Self(self.0.pow(rhs).inv())
         } else {
-            opr as u32
-        }; // get a positive conjugate
-        self * opr
+            let rhs = rhs as u32;
+            Self(self.0.pow(rhs))
+        }
     }
 }
 
 impl<const P: u32> From<u32> for E1<P> {
     fn from(base: u32) -> Self {
-        Self(base)
+        Self(MontgomeryInt::new(base, &P))
     }
 }

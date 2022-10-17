@@ -3,17 +3,17 @@ mod e2;
 
 fn main() {
     // generator
-    let g = e2::E2::<93, 97>::from((3u32, 15u32));
-    //let g = e1::E1::<97>::from(5);
+    //let g = e2::E2::<93, 97>::from((3u32, 15u32));
+    let g = e1::E1::<97>::from(5);
 
     // Verifier's knowledge
-    let x = 999;
-    let shift = 16;
+    let x = 999u32;
+    let shift = 16u32;
     let t = x * x - 3 * x + 2; // The target polynomial solved for x
     let s3 = g * (x * x * x);
     let s2 = g * (x * x);
     let s1 = g * (x);
-    let s0 = g * (1);
+    let s0 = g * (1u32);
     let s3_shift = s3 * shift;
     let s2_shift = s2 * shift;
     let s1_shift = s1 * shift;
@@ -21,13 +21,13 @@ fn main() {
 
     // To prover:
     // p(x) = x^3 - 6x^2 + 11x - 6
-    let p_c0 = 1;
-    let p_c1 = -6;
-    let p_c2 = 11;
-    let p_c3 = -6;
+    let p_c0 = 1u32;
+    let p_c1 = -6i32;
+    let p_c2 = 11u32;
+    let p_c3 = -6i32;
     // h(x) = x - 3
-    let h_c0 = 1;
-    let h_c1 = -3;
+    let h_c0 = 1u32;
+    let h_c1 = -3i32;
     let s3 = s3; // \
     let s2 = s2; // | Prover is given these...
     let s1 = s1; // /
@@ -41,7 +41,7 @@ fn main() {
     let ep_shift = s3_shift * p_c0 + s2_shift * p_c1 + s1_shift * p_c2 + s0_shift * p_c3;
 
     // Apply shift so encrypted values sent to verifier cant be guess
-    let delta = 39; // Some random delta
+    let delta = 39u32; // Some random delta
     let ep = ep * delta;
     let eh = eh * delta;
     let ep_shift = ep_shift * delta;

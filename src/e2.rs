@@ -1,6 +1,5 @@
 use num_modular::ModularInteger;
 use num_modular::MontgomeryInt;
-use num_modular::Vanilla;
 use num_traits::ops::inv::Inv;
 
 // Homomorphic encryption using elliptic curves

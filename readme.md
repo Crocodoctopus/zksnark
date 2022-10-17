@@ -1,0 +1,1 @@
+An (soon to be) implementation of zksnarks, as a learning exercise. Currently on hold while I work on a zkstark implementation (and figure out the math for elliptic curve bilinear mapping).
